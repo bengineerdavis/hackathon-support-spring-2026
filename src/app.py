@@ -8,7 +8,7 @@ from src import theme
 from src.storage import load_all_summaries
 
 st.set_page_config(
-    page_title="Sentry Log Summarizer",
+    page_title="Sentry Error Attachment Summarizer",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -16,7 +16,7 @@ theme.apply()
 
 summaries = load_all_summaries()
 
-st.title("Sentry Log Summarizer")
+st.title("Sentry Error Attachment Summarizer")
 st.caption("[:material/code: source](https://github.com/bengineerdavis/hackathon-support-spring-2026)")
 
 if not summaries:
@@ -27,8 +27,8 @@ if not summaries:
     st.stop()
 
 st.caption(
-    f"{len(summaries)} issue(s) captured — click any issue to view its attachments, "
-    "full summary, and research."
+    f"{len(summaries)} error event(s) — each summarized from its raw attachments. "
+    "Click any issue to view the AI analysis and research."
 )
 
 st.divider()

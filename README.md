@@ -1,6 +1,6 @@
-# Sentry Log Summarizer
+# Sentry Error Attachment Summarizer
 
-Pulls raw log attachments from Sentry issues, summarizes all attachments per event with a local LLM in a single prompt, and presents results in a two-page Streamlit UI. A built-in research tool cross-references each issue against the Sentry Help Center, sentry-docs (local vector index), and the web.
+Pulls raw file attachments from Sentry error events, summarizes them per event with a local LLM, and presents an AI-generated analysis in a two-page Streamlit UI. A built-in research tool cross-references each issue against the Sentry Help Center, sentry-docs (local vector index), and the web.
 
 ---
 

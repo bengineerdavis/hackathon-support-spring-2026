@@ -8,7 +8,7 @@ from src.research import load_session, research_issue
 from src.storage import load_all_summaries, load_raw_attachment
 
 st.set_page_config(
-    page_title="Issue — Sentry Log Summarizer",
+    page_title="Issue — Sentry Error Attachment Summarizer",
     layout="wide",
 )
 theme.apply()
