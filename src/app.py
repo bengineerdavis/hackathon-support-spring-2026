@@ -63,3 +63,7 @@ for s in summaries:
         )
 
     st.divider()
+
+st.caption(
+    "[:material/code: View source on GitHub](https://github.com/bengineerdavis/hackathon-support-spring-2026)"
+)

@@ -175,3 +175,6 @@ if session:
 
 st.divider()
 st.page_link("app.py", label="← Back to all issues", icon=":material/arrow_back:")
+st.caption(
+    "[:material/code: View source on GitHub](https://github.com/bengineerdavis/hackathon-support-spring-2026)"
+)
