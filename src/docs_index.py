@@ -32,11 +32,26 @@ def sync_docs() -> Path:
 
 
 def _clean(text: str) -> str:
-    text = re.sub(r"^---\n.*?\n---\n", "", text, flags=re.DOTALL)
+    text = re.sub(r"^---\n.*?\n---\n", "", text, flags=re.DOTALL)  # frontmatter
+    text = re.sub(r"```[^\n]*\n.*?```", "", text, flags=re.DOTALL)  # fenced code blocks
     text = re.sub(r"<[A-Za-z][^>]*>.*?</[A-Za-z][^>]*>", "", text, flags=re.DOTALL)
     text = re.sub(r"<[A-Za-z][^>]*/?>", "", text)
     text = re.sub(r"\{/\*.*?\*/\}", "", text, flags=re.DOTALL)
     return text.strip()
+
+
+def _prose_ratio(text: str) -> float:
+    """Estimate fraction of lines that are natural-language prose rather than code (0–1)."""
+    lines = [l for l in text.splitlines() if l.strip()]
+    if not lines:
+        return 0.0
+    prose = sum(
+        1 for l in lines
+        if not l.startswith("    ")                    # not indented code
+        and not re.match(r"^\s*[`{}\[\]()<>|=]", l)   # not symbol-heavy lines
+        and len(l.split()) > 3                         # at least a few words
+    )
+    return prose / len(lines)
 
 
 def _split_chunks(text: str) -> list[str]:
@@ -115,6 +130,8 @@ def _source_to_url(source: str) -> str | None:
 def search_docs(query: str, n: int = 5) -> list[dict]:
     """Return top-n relevant doc chunks as {text, source, url} dicts.
 
+    Fetches 4× candidates from ChromaDB then re-ranks by prose density so
+    written explanations and concepts surface above raw code examples.
     url is the docs.sentry.io page URL, or None for partial/include files.
     Returns [] if the index has not been built yet.
     """
@@ -125,8 +142,19 @@ def search_docs(query: str, n: int = 5) -> list[dict]:
         return []
     if collection.count() == 0:
         return []
-    results = collection.query(query_texts=[query], n_results=min(n, collection.count()))
-    return [
-        {"text": doc, "source": meta["source"], "url": _source_to_url(meta["source"])}
+    fetch = min(n * 4, collection.count())
+    results = collection.query(query_texts=[query], n_results=fetch)
+    candidates = [
+        {
+            "text": doc,
+            "source": meta["source"],
+            "url": _source_to_url(meta["source"]),
+            "_prose": _prose_ratio(doc),
+        }
         for doc, meta in zip(results["documents"][0], results["metadatas"][0])
+    ]
+    candidates.sort(key=lambda c: c["_prose"], reverse=True)
+    return [
+        {"text": c["text"], "source": c["source"], "url": c["url"]}
+        for c in candidates[:n]
     ]
