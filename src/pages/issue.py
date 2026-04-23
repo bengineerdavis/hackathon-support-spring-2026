@@ -79,7 +79,8 @@ with col_title:
     st.caption(
         f"Event `{event['event_id']}` · "
         f"Issue `{event.get('issue_id', '—')}` · "
-        f"{event['timestamp']}"
+        f"{event['timestamp']} · "
+        "[:material/code: source](https://github.com/bengineerdavis/hackathon-support-spring-2026)"
     )
 with col_btn:
     btn = _primary_sentry_button(event)
@@ -175,6 +176,3 @@ if session:
 
 st.divider()
 st.page_link("app.py", label="← Back to all issues", icon=":material/arrow_back:")
-st.caption(
-    "[:material/code: View source on GitHub](https://github.com/bengineerdavis/hackathon-support-spring-2026)"
-)

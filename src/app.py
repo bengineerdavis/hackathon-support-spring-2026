@@ -17,6 +17,7 @@ theme.apply()
 summaries = load_all_summaries()
 
 st.title("Sentry Log Summarizer")
+st.caption("[:material/code: source](https://github.com/bengineerdavis/hackathon-support-spring-2026)")
 
 if not summaries:
     st.info(
@@ -63,7 +64,3 @@ for s in summaries:
         )
 
     st.divider()
-
-st.caption(
-    "[:material/code: View source on GitHub](https://github.com/bengineerdavis/hackathon-support-spring-2026)"
-)
