@@ -153,12 +153,12 @@ if session:
         if doc_results:
             for r in doc_results:
                 url = r.get("url")
-                if url:
-                    st.markdown(f"**[{r['source']}]({url})**")
-                else:
-                    st.markdown(f"**`{r['source']}`**")
-                st.markdown(r["text"])
-                st.divider()
+                label = r["source"].split("/")[-1].replace(".mdx", "").replace(".md", "").replace("-", " ").title()
+                header = f"[{label}]({url})" if url else f"`{r['source']}`"
+                with st.expander(header):
+                    st.markdown(r["text"])
+                    if url:
+                        st.markdown(f"[View on docs.sentry.io →]({url})")
         else:
             st.caption("No docs results — run `mise run index-docs` to build the index.")
 
