@@ -10,6 +10,7 @@ from src.storage import load_all_summaries, load_raw_attachment
 st.set_page_config(
     page_title="Issue — Sentry Error Attachment Summarizer",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 theme.apply()
 
@@ -22,28 +23,17 @@ event = next((s for s in summaries if s["event_id"] == event_id), None)
 # ── Sidebar: navigation ───────────────────────────────────────────────────────
 
 with st.sidebar:
-    st.page_link("app.py", label="← All issues", icon=":material/arrow_back:")
+    st.markdown("### Issues")
+    st.page_link("app.py", label="All issues", icon=":material/home:")
     st.divider()
-
     if summaries:
-        st.caption("Switch issue")
-        labels = [
-            f"{s['title'][:45] or s['event_id']} — {s['timestamp'][:10]}"
-            for s in summaries
-        ]
-        current_idx = next(
-            (i for i, s in enumerate(summaries) if s["event_id"] == event_id), 0
-        )
-        selected_idx = st.radio(
-            "switch_issue",
-            range(len(summaries)),
-            index=current_idx,
-            format_func=lambda i: labels[i],
-            label_visibility="collapsed",
-        )
-        if summaries[selected_idx]["event_id"] != event_id:
-            st.query_params["event_id"] = summaries[selected_idx]["event_id"]
-            st.rerun()
+        for s in summaries:
+            label = f"{s['title'][:40] or s['event_id']} — {s['timestamp'][:10]}"
+            st.page_link(
+                "pages/issue.py",
+                label=label,
+                query_params={"event_id": s["event_id"]},
+            )
 
 # ── Guard: no valid event_id ──────────────────────────────────────────────────
 

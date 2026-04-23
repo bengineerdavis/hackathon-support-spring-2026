@@ -10,11 +10,26 @@ from src.storage import load_all_summaries
 st.set_page_config(
     page_title="Sentry Error Attachment Summarizer",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 theme.apply()
 
 summaries = load_all_summaries()
+
+# ── Sidebar: issue navigation ─────────────────────────────────────────────────
+
+with st.sidebar:
+    st.markdown("### Issues")
+    if summaries:
+        for s in summaries:
+            label = f"{s['title'][:40] or s['event_id']} — {s['timestamp'][:10]}"
+            st.page_link(
+                "pages/issue.py",
+                label=label,
+                query_params={"event_id": s["event_id"]},
+            )
+    else:
+        st.caption("No issues yet.")
 
 st.title("Sentry Error Attachment Summarizer")
 st.caption("[:material/code: source](https://github.com/bengineerdavis/hackathon-support-spring-2026)")
