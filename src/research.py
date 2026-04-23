@@ -11,6 +11,7 @@ separate ChromaDB collection so future queries can reuse relevant prior work.
 """
 
 import json
+import re as _re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -107,12 +108,14 @@ def research_issue(
     embedding_text = f"{title}\n{summary}"
     similar = find_similar_sessions(embedding_text)
 
-    # Extract the error class (e.g. "TypeError") for targeted queries
     error_class = title.split(":")[0].strip()
+    # Pull the "What happened" line from structured AI summary for targeted queries
+    _wh = _re.search(r"\*\*What happened:\*\*\s*(.+?)(?:\n|$)", summary)
+    what_happened = _wh.group(1).strip() if _wh else summary[:200]
 
-    doc_results = search_docs(f"{title} {summary[:300]}")
-    web_results = search_web(f"python {title}", n=5)
-    help_results = search_help(f"{error_class} SDK error capture configuration", n=5)
+    doc_results = search_docs(f"{title} {summary[:600]}")
+    web_results = search_web(f"{error_class}: {what_happened}", n=5)
+    help_results = search_help(f"{title} {what_happened}", n=5)
 
     session = {
         "session_id": str(uuid.uuid4()),

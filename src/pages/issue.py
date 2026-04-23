@@ -88,20 +88,14 @@ with col_btn:
         url, label, icon = btn
         st.link_button(label, url, icon=icon, type="primary", use_container_width=True)
 
-# ── Summary ───────────────────────────────────────────────────────────────────
-
-st.markdown("### AI Analysis")
-st.caption("Generated from the raw log attachments below — not reproduced verbatim.")
-st.markdown(event.get("summary", "_No summary available._"))
-
 # ── Attachments ───────────────────────────────────────────────────────────────
 
 attachments = event.get("attachments", [])
 if attachments:
     st.markdown("### Attachments")
     st.caption(
-        f"{len(attachments)} file{'s' if len(attachments) != 1 else ''} — "
-        "all processed together as context for the summary above"
+        f"{len(attachments)} raw file{'s' if len(attachments) != 1 else ''} captured with this event — "
+        "all processed together as the source for the AI analysis below"
     )
     for att in attachments:
         with st.expander(att["filename"]):
@@ -112,6 +106,16 @@ if attachments:
                 st.code(raw_text, language="text")
             except FileNotFoundError:
                 st.error("Raw attachment file not found on disk.")
+
+# ── Summary ───────────────────────────────────────────────────────────────────
+
+st.markdown("### AI Analysis of Attachments")
+st.caption(
+    f"LLM-generated summary of the {len(attachments)} attachment{'s' if len(attachments) != 1 else ''} above — "
+    "raw content not reproduced verbatim."
+    if attachments else "LLM-generated summary — no raw attachments available."
+)
+st.markdown(event.get("summary", "_No summary available._"))
 
 # ── Research ──────────────────────────────────────────────────────────────────
 
