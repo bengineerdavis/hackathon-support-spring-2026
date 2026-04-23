@@ -1,0 +1,78 @@
+[tools]
+python = "3.12"
+uv = "latest"
+
+[env]
+_.python.venv = { path = ".venv", create = true }
+
+[hooks]
+enter = "uv sync --all-groups --quiet"
+
+# ── Setup ─────────────────────────────────────────────────────────────────────
+
+[tasks.setup]
+description = "Install all dependencies (runs automatically on cd)"
+run = "uv sync --all-groups"
+
+[tasks.install-model-plugin]
+description = "Register the llm-ollama plugin so local Ollama models are available"
+run = "uv run llm install llm-ollama"
+
+[tasks.check-access]
+description = "Verify the Sentry auth token has the required API scopes"
+run = "uv run python -c 'from src.sentry_client import assert_permissions; assert_permissions()'"
+
+# ── Data: first run ───────────────────────────────────────────────────────────
+
+[tasks.generate-events]
+description = "Send 3 fake exception events with log attachments to Sentry (seeding only)"
+run = "uv run python src/event_generator.py"
+
+[tasks.pipeline]
+description = "Fetch issues from Sentry, summarize all attachments per event, save to disk"
+run = "uv run python src/summarizer.py"
+
+[tasks.research]
+description = "Search Sentry Help Center, docs index, and web for each summarized issue (skips cached)"
+run = "uv run python src/research.py"
+
+[tasks.index-docs]
+description = "Shallow-clone sentry-docs and build the local vector index (one-time, ~10 min)"
+run = "uv run python -c 'from src.docs_index import sync_docs, build_index; sync_docs(); build_index()'"
+
+# ── Data: refresh ─────────────────────────────────────────────────────────────
+
+[tasks.refresh]
+description = "Re-fetch all Sentry data and run research on any new issues"
+run = """
+uv run python src/summarizer.py --force-refresh
+uv run python src/research.py
+"""
+
+[tasks.refresh-all]
+description = "Full refresh: clear API cache, re-summarize everything, re-run all research"
+run = """
+uv run python -c 'from src.cache import clear; clear()'
+uv run python src/summarizer.py --force-refresh
+uv run python src/research.py --force-refresh
+"""
+
+[tasks.clear-cache]
+description = "Clear the Sentry API response cache only"
+run = "uv run python -c 'from src.cache import clear; clear()'"
+
+[tasks.index-docs-rebuild]
+description = "Force a full rebuild of the sentry-docs vector index"
+run = "uv run python -c 'from src.docs_index import sync_docs, build_index; sync_docs(); build_index(force=True)'"
+
+# ── UI ────────────────────────────────────────────────────────────────────────
+
+[tasks.app]
+description = "Launch the Streamlit UI (auto-reloads on code changes)"
+run = "uv run streamlit run src/app.py"
+
+# ── Dev ───────────────────────────────────────────────────────────────────────
+
+[tasks.test]
+description = "Run the full test suite (no .env or Ollama required)"
+run = "uv run pytest tests/ -v"

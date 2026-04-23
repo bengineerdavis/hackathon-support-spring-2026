@@ -1,0 +1,7 @@
+Event title: {title}
+
+The following {count} log attachment(s) were captured with this event:
+
+{attachment_blocks}
+
+Summarize what went wrong across all attached logs.

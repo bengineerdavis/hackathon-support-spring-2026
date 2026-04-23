@@ -1,0 +1,31 @@
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Tests
+.pytest_cache/
+
+# Data — all runtime-generated; cloned, cached, indexed, or fetched at runtime
+data/cache/
+data/chroma/
+data/events/
+data/research/
+data/sentry-docs/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude Code project files
+.claude/

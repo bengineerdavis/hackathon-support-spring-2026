@@ -1,0 +1,23 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# Top-most EditorConfig file
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Node.js and TypeScript (JavaScript, JSON, YAML)
+[*.{js,ts,jsx,tsx,json,yml,yaml,md}]
+indent_style = space
+indent_size = 2
+
+# Python
+[*.py]
+indent_style = space
+indent_size = 4
+# Choose one of the following based on your preference:
+max_line_length = 95
